@@ -1,0 +1,43 @@
+pipeline{
+agent any
+tools {
+  maven 'test'
+  dockerTool 'Docker'
+}
+parameters {
+  string defaultValue: '8081', description: 'tomcat on sever', name: 'port'
+}
+
+
+ 
+stages{
+
+ stage(compile){
+    steps{
+         sh 'npm install'
+         }
+}
+ 
+
+stage(deploy){
+ 
+     
+steps{
+echo 'Deleting Old Docker container...'
+					sh "sudo docker rm --force webserver"
+					echo 'Old Docker container Deleted successfully'
+
+ sh 'sudo docker build -t image:$BUILD_NUMBER  . '
+
+echo 'Starting Docker Container'
+					sh "sudo docker run --name webserver -d -p ${params.port}:8080 image:$BUILD_NUMBER "
+					echo "Docker Container started successfully at port : ${params.port}"
+                                        echo "this is done "
+
+
+
+}
+}
+
+}
+}
